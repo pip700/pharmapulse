@@ -1,3 +1,4 @@
+
 export interface Medicine {
   id: string;
   name: string;
@@ -54,6 +55,15 @@ export interface AppSettings {
   currency: string;
   locale: string;
   countryName: string;
+}
+
+export interface AuditLog {
+  id: string;
+  action: string;
+  details: string;
+  timestamp: string;
+  user: string;
+  type: 'info' | 'warning' | 'success';
 }
 
 export type Page = 'dashboard' | 'inventory' | 'billing' | 'analytics' | 'orders';

@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { Medicine, Vendor } from '../types';
 import { db } from '../services/db';
@@ -34,6 +35,7 @@ export const Inventory: React.FC<InventoryProps> = ({ formatCurrency }) => {
   };
 
   const handleStockAdjust = (id: string, delta: number) => {
+    const medName = medicines.find(m => m.id === id)?.name;
     const updated = medicines.map(m => {
         if (m.id === id) {
             return { ...m, stock: Math.max(0, m.stock + delta) };
@@ -42,6 +44,9 @@ export const Inventory: React.FC<InventoryProps> = ({ formatCurrency }) => {
     });
     setMedicines(updated);
     db.saveMedicines(updated);
+    if(Math.abs(delta) > 0) {
+        db.addAuditLog('Stock Adjustment', `Manual adjustment for ${medName}: ${delta > 0 ? '+' : ''}${delta}`, 'info');
+    }
   };
 
   const handleExportRestock = () => {
@@ -74,6 +79,8 @@ export const Inventory: React.FC<InventoryProps> = ({ formatCurrency }) => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    
+    db.addAuditLog('Export', 'Downloaded Restock CSV List', 'info');
   };
 
   const filtered = medicines.filter(m => {
@@ -137,10 +144,12 @@ export const Inventory: React.FC<InventoryProps> = ({ formatCurrency }) => {
   );
 
   const handleDelete = (id: string) => {
-    if(confirm('Are you sure?')) {
+    if(confirm('Are you sure you want to delete this medicine?')) {
+      const medName = medicines.find(m => m.id === id)?.name;
       const updated = medicines.filter(m => m.id !== id);
       db.saveMedicines(updated);
       setMedicines(updated);
+      db.addAuditLog('Delete Item', `Removed medicine: ${medName}`, 'warning');
     }
   };
 
@@ -151,6 +160,7 @@ export const Inventory: React.FC<InventoryProps> = ({ formatCurrency }) => {
     if (editItem.id) {
         // Edit
         updatedMeds = updatedMeds.map(m => m.id === editItem.id ? { ...m, ...editItem } as Medicine : m);
+        db.addAuditLog('Update Item', `Updated details for ${editItem.name}`, 'info');
     } else {
         // Add
         const newMed: Medicine = {
@@ -166,6 +176,7 @@ export const Inventory: React.FC<InventoryProps> = ({ formatCurrency }) => {
             vendorId: editItem.vendorId || vendors[0]?.id
         };
         updatedMeds.push(newMed);
+        db.addAuditLog('New Item', `Added new medicine: ${newMed.name}`, 'success');
     }
     db.saveMedicines(updatedMeds);
     setMedicines(updatedMeds);

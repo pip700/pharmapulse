@@ -1,4 +1,5 @@
-import { Medicine, Sale, Vendor, AppSettings } from '../types';
+
+import { Medicine, Sale, Vendor, AppSettings, AuditLog } from '../types';
 
 // Initial Seed Data
 const INITIAL_VENDORS: Vendor[] = [
@@ -20,6 +21,7 @@ const STORAGE_KEYS = {
   SALES: 'pharmacy_sales',
   VENDORS: 'pharmacy_vendors',
   SETTINGS: 'pharmacy_settings',
+  AUDIT: 'pharmacy_audit',
 };
 
 // Helper to load data
@@ -64,10 +66,29 @@ export const db = {
     sale.items.forEach(item => {
       db.updateMedicineStock(item.medicineId, item.quantity);
     });
+    
+    db.addAuditLog('Sale Completed', `Sale ID: ${sale.id}, Items: ${sale.items.length}, Total: ${sale.totalAmount}`, 'success');
   },
 
   getSettings: (): AppSettings => loadData(STORAGE_KEYS.SETTINGS, { currency: 'USD', locale: 'en-US', countryName: 'United States' }),
   saveSettings: (settings: AppSettings) => saveData(STORAGE_KEYS.SETTINGS, settings),
+
+  // Audit Logs
+  getAuditLogs: (): AuditLog[] => loadData(STORAGE_KEYS.AUDIT, []),
+  addAuditLog: (action: string, details: string, type: 'info' | 'warning' | 'success' = 'info') => {
+    const logs = db.getAuditLogs();
+    const newLog: AuditLog = {
+      id: Date.now().toString(),
+      action,
+      details,
+      timestamp: new Date().toISOString(),
+      user: 'Owner',
+      type
+    };
+    logs.unshift(newLog);
+    // Keep last 200 logs
+    saveData(STORAGE_KEYS.AUDIT, logs.slice(0, 200));
+  },
 
   // Helper for generating CSV
   exportSalesToCSV: (): string => {

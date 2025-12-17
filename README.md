@@ -1,20 +1,68 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# PharmaPulse - Pharmacy Management System
 
-# Run and deploy your AI Studio app
+A comprehensive React + Electron + Capacitor application designed for pharmacy inventory management, billing, and analytics.
 
-This contains everything you need to run your app locally.
+## 🚀 Features
 
-View your app in AI Studio: https://ai.studio/apps/drive/1nX8h6YZ3JsXauIllJXh8JyK0vuuHkSJ3
+- **Inventory Tracking**: Real-time stock levels, low stock alerts, and expiry tracking.
+- **Smart Billing (POS)**: Quick cart management, receipt generation, and sales history.
+- **Auto-Order**: Intelligent suggestions for restocking based on threshold levels.
+- **Analytics**: Visual charts for revenue, profit trends, and category performance.
+- **Secure Access**: PIN-based authentication for owner security.
+- **Cross-Platform**: Runs on Web, Desktop (Linux/Windows/Mac), and Mobile (iOS/Android).
 
-## Run Locally
+## 🛠 Project Setup
 
-**Prerequisites:**  Node.js
+### Prerequisites
+- Node.js (v18 or v20 recommended)
+- Git
 
+### Installation
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/your-username/pharmapulse.git
+   cd pharmapulse
+   ```
+
+2. **Install Dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Run Locally (Web)**
+   ```bash
+   npm run dev
+   ```
+
+## 📱 Building for Mobile (iOS)
+
+This project uses **GitHub Actions** to build the iOS `.ipa` file automatically, so you don't need a Mac.
+
+1. **Push your code to GitHub**:
+   ```bash
+   git add .
+   git commit -m "Update app"
+   git push origin main
+   ```
+   *(If you get an error, try `git push -f origin main`)*
+
+2. **Download the App**:
+   - Go to your GitHub Repository -> **Actions** tab.
+   - Click on the latest "Build iOS IPA" workflow run.
+   - Scroll down to **Artifacts** and download `ios-app-unsigned`.
+
+## 🖥 Building for Desktop
+
+To build a `.deb` (Linux) or `.exe` (Windows) file:
+
+```bash
+# Linux
+npm run dist:linux
+
+# Windows
+npm run dist:win
+```
+
+## 🔐 Default Login
+- **PIN**: `1234`
