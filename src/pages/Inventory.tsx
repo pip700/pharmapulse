@@ -13,6 +13,7 @@ export const Inventory: React.FC<InventoryProps> = ({ formatCurrency }) => {
   const [vendors, setVendors] = useState<Vendor[]>([]);
   const [search, setSearch] = useState('');
   const [showExpiringOnly, setShowExpiringOnly] = useState(false);
+  const [showLowStockOnly, setShowLowStockOnly] = useState(false); // New Filter
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('grid');
   
   const [sortConfig, setSortConfig] = useState<{ key: string, direction: 'asc' | 'desc' }>({ key: 'stock', direction: 'asc' });
@@ -87,11 +88,16 @@ export const Inventory: React.FC<InventoryProps> = ({ formatCurrency }) => {
     const matchesSearch = m.name.toLowerCase().includes(search.toLowerCase()) || 
                           m.category.toLowerCase().includes(search.toLowerCase());
     
+    let matchesFilter = true;
     if (showExpiringOnly) {
         const days = getDaysToExpiry(m.expiryDate);
-        return matchesSearch && days <= 90;
+        matchesFilter = matchesFilter && (days <= 90);
     }
-    return matchesSearch;
+    if (showLowStockOnly) {
+        matchesFilter = matchesFilter && (m.stock <= m.threshold);
+    }
+
+    return matchesSearch && matchesFilter;
   });
 
   const sortedMedicines = [...filtered].sort((a, b) => {
@@ -268,7 +274,7 @@ export const Inventory: React.FC<InventoryProps> = ({ formatCurrency }) => {
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 min-h-[500px]">
-        <div className="flex flex-col sm:flex-row gap-4 mb-6">
+        <div className="flex flex-col xl:flex-row gap-4 mb-6">
             <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
                 <input 
@@ -280,22 +286,36 @@ export const Inventory: React.FC<InventoryProps> = ({ formatCurrency }) => {
                 />
             </div>
             
-            <button
-                onClick={() => setShowExpiringOnly(!showExpiringOnly)}
-                className={`px-4 py-2 rounded-lg flex items-center space-x-2 border transition-colors ${
-                    showExpiringOnly 
-                    ? 'bg-amber-50 text-amber-700 border-amber-200 ring-1 ring-amber-200' 
-                    : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
-                }`}
-            >
-                <Filter size={18} className={showExpiringOnly ? "fill-amber-700/20" : ""} />
-                <span>Expiring (90 Days)</span>
-            </button>
+            <div className="flex gap-2 overflow-x-auto pb-1">
+                <button
+                    onClick={() => setShowExpiringOnly(!showExpiringOnly)}
+                    className={`px-4 py-2 rounded-lg flex items-center space-x-2 border whitespace-nowrap transition-colors ${
+                        showExpiringOnly 
+                        ? 'bg-purple-50 text-purple-700 border-purple-200 ring-1 ring-purple-200' 
+                        : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+                    }`}
+                >
+                    <CalendarClock size={18} className={showExpiringOnly ? "text-purple-600" : ""} />
+                    <span>Expiring (90 Days)</span>
+                </button>
+                
+                <button
+                    onClick={() => setShowLowStockOnly(!showLowStockOnly)}
+                    className={`px-4 py-2 rounded-lg flex items-center space-x-2 border whitespace-nowrap transition-colors ${
+                        showLowStockOnly 
+                        ? 'bg-amber-50 text-amber-700 border-amber-200 ring-1 ring-amber-200' 
+                        : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+                    }`}
+                >
+                    <AlertCircle size={18} className={showLowStockOnly ? "text-amber-600" : ""} />
+                    <span>Low Stock</span>
+                </button>
+            </div>
 
-            {(search || showExpiringOnly) && (
+            {(search || showExpiringOnly || showLowStockOnly) && (
                 <button 
-                    onClick={() => { setSearch(''); setShowExpiringOnly(false); }}
-                    className="px-4 py-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors text-sm font-medium flex items-center gap-1"
+                    onClick={() => { setSearch(''); setShowExpiringOnly(false); setShowLowStockOnly(false); }}
+                    className="px-4 py-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors text-sm font-medium flex items-center gap-1 shrink-0"
                 >
                     <X size={16} />
                     Clear
@@ -307,7 +327,7 @@ export const Inventory: React.FC<InventoryProps> = ({ formatCurrency }) => {
              <div className="flex flex-col items-center justify-center py-12 text-gray-400">
                  <Package size={48} className="mb-2 opacity-20" />
                  <p>No medicines found matching your criteria.</p>
-                 <button onClick={() => { setSearch(''); setShowExpiringOnly(false); }} className="mt-4 text-teal-600 hover:underline">Clear all filters</button>
+                 <button onClick={() => { setSearch(''); setShowExpiringOnly(false); setShowLowStockOnly(false); }} className="mt-4 text-teal-600 hover:underline">Clear all filters</button>
              </div>
         )}
 

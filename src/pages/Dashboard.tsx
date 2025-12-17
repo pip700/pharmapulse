@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { Medicine, Sale } from '../types';
 import { db } from '../services/db';
@@ -134,7 +135,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ formatCurrency }) => {
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
                                 <XAxis dataKey="name" fontSize={10} interval={0} angle={-15} textAnchor="end" height={40} tick={{fill: '#6b7280'}} />
                                 <YAxis fontSize={12} tick={{fill: '#6b7280'}} />
-                                <Tooltip cursor={{fill: 'transparent'}} />
+                                <Tooltip 
+                                  cursor={{fill: 'transparent'}}
+                                  formatter={(value: number) => [`${value} units`, 'Stock']}
+                                />
                                 <Bar dataKey="stock" name="Current Stock" radius={[4, 4, 0, 0]}>
                                     {lowStockItems.map((entry, index) => (
                                         <Cell key={`cell-${index}`} fill={entry.stock === 0 ? '#ef4444' : entry.stock <= entry.threshold ? '#f59e0b' : '#3b82f6'} />
