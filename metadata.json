@@ -1,0 +1,5 @@
+{
+  "name": "PharmaPulse",
+  "description": "A comprehensive pharmacy management system featuring stock visualization, smart billing, profit analytics, and auto-ordering suggestions.",
+  "requestFramePermissions": []
+}
