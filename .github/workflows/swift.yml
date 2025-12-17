@@ -1,0 +1,11 @@
+name: Disabled Swift Workflow
+# This file exists to overwrite the default GitHub Swift workflow that is causing errors.
+# We use build-ios.yml instead.
+on:
+  workflow_dispatch:
+
+jobs:
+  disabled:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "This workflow is disabled to prevent conflicts with build-ios.yml"
