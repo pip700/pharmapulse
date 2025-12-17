@@ -11,6 +11,15 @@ A comprehensive React + Electron + Capacitor application designed for pharmacy i
 - **Secure Access**: PIN-based authentication for owner security.
 - **Cross-Platform**: Runs on Web, Desktop (Linux/Windows/Mac), and Mobile (iOS/Android).
 
+## ⚠️ IMPORTANT: Fix Build Error
+If your iOS Build fails with `xcodebuild: error: The directory ... does not contain an Xcode project`, it means you have conflicting workflow files.
+
+**To fix this:**
+1. Open your project folder.
+2. Go to `.github/workflows/`.
+3. **DELETE** any file that is **NOT** named `build-ios.yml` (e.g., delete `swift.yml`, `xcode.yml`, `objective-c.yml`).
+4. Commit and push again.
+
 ## 🛠 Project Setup
 
 ### Prerequisites
@@ -45,7 +54,7 @@ This project uses **GitHub Actions** to build the iOS `.ipa` file automatically,
    git commit -m "Update app"
    git push origin main
    ```
-   *(If you get an error, try `git push -f origin main`)*
+   *(If you get a rejection error, try `git push -f origin main`)*
 
 2. **Download the App**:
    - Go to your GitHub Repository -> **Actions** tab.

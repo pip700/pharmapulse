@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, Legend } from 'recharts';
 import { db } from '../services/db';
@@ -61,6 +62,22 @@ export const Analytics: React.FC<AnalyticsProps> = ({ formatCurrency }) => {
 
   const pieData = Object.values(categoryStats).filter(d => d.sales > 0);
   
+  // Top Products Logic
+  const productStats = sales.reduce((acc, sale) => {
+    sale.items.forEach(item => {
+      if (!acc[item.medicineName]) {
+        acc[item.medicineName] = { name: item.medicineName, quantity: 0, revenue: 0 };
+      }
+      acc[item.medicineName].quantity += item.quantity;
+      acc[item.medicineName].revenue += item.quantity * item.priceAtSale;
+    });
+    return acc;
+  }, {} as Record<string, {name: string, quantity: number, revenue: number}>);
+  
+  const topProducts = Object.values(productStats)
+    .sort((a, b) => b.quantity - a.quantity)
+    .slice(0, 5);
+
   // Vibrant color palette for charts
   const COLORS = ['#0d9488', '#f59e0b', '#3b82f6', '#ef4444', '#8b5cf6', '#ec4899', '#6366f1'];
 
@@ -206,6 +223,26 @@ export const Analytics: React.FC<AnalyticsProps> = ({ formatCurrency }) => {
                 )}
             </div>
         </div>
+      </div>
+
+      {/* Row 3: Top Products */}
+      <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+          <h3 className="font-bold text-gray-700 mb-6">Top 5 Best Selling Medicines</h3>
+          <div className="h-64">
+              {topProducts.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                    <BarChart layout="vertical" data={topProducts} margin={{ left: 20 }}>
+                        <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="#f0f0f0" />
+                        <XAxis type="number" fontSize={12} tickLine={false} axisLine={false} />
+                        <YAxis dataKey="name" type="category" width={100} fontSize={12} tickLine={false} axisLine={false} />
+                        <Tooltip formatter={(value: number) => [value, 'Units Sold']} cursor={{fill: '#f8fafc'}} />
+                        <Bar dataKey="quantity" fill="#f59e0b" radius={[0, 4, 4, 0]} barSize={20} />
+                    </BarChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="h-full flex items-center justify-center text-gray-400">No sales data available</div>
+              )}
+          </div>
       </div>
     </div>
   );
